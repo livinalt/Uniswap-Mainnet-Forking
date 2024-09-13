@@ -12,7 +12,7 @@ async function main() {
     const impersonatedSigner = await ethers.getSigner(TOKEN_HOLDER);
 
     const amountOut = ethers.parseUnits("20", 18);
-    const amountInMax = ethers.parseUnits("1000", 6);
+    const amountInMin = ethers.parseUnits("10", 6);
 
     const USDC_Contract = await ethers.getContractAt("IERC20", USDC, impersonatedSigner);
     const DAI_Contract = await ethers.getContractAt("IERC20", DAI);
@@ -28,13 +28,13 @@ async function main() {
     console.log("usdc balance before swap", Number(usdcBal));
     console.log("dai balance before swap", Number(daiBal));
 
-    await ROUTER.swapTokensForExactTokens(
+    await ROUTER.swapExactTokensForTokens(
         amountOut,
-        amountInMax,
+        amountInMin,
         [USDC, DAI],
         impersonatedSigner.address,
         deadline
-    );
+     );
 
     const usdcBalAfter = await USDC_Contract.balanceOf(impersonatedSigner.address);
     const daiBalAfter = await DAI_Contract.balanceOf(impersonatedSigner.address);
