@@ -44,7 +44,49 @@ async function main() {
     console.log("usdc balance after swap", Number(usdcBalAfter));
     console.log("dai balance after swap", Number(daiBalAfter));
 
+    console.log("////////////////////////////////////////////////////////");
+    console.log("ADDING LIQUIDITY");
+    console.log("////////////////////////////////////////////////////////");
 
+    // TOKEN A IS USDC (6 decimals), TOKEN B IS DAI (18 decimals)
+    const amountADesired = ethers.parseUnits("20", 6); // USDC is 6 decimals
+    const amountBDesired = ethers.parseUnits("20", 18); // DAI is 18 decimals
+
+    // Define slippage tolerance (e.g., 1% slippage)
+    const amountAMin = ethers.parseUnits("19.8", 6); 
+    const amountBMin = ethers.parseUnits("19.8", 18); 
+
+    // `to` is the address that will receive the liquidity tokens
+    const to = impersonatedSigner.address;
+
+    const usdcBalBefore = await USDC_Contract.balanceOf(impersonatedSigner.address);
+    const daiBalBefore = await DAI_Contract.balanceOf(impersonatedSigner.address);
+
+    console.log("usdc balance before adding liquidity", Number(usdcBalBefore));
+    console.log("dai balance before adding liquidity", Number(daiBalBefore));
+
+    // Check balances before adding liquidity
+    const usdcNewBal = await USDC_Contract.balanceOf(impersonatedSigner.address);
+    const daiNewBal = await DAI_Contract.balanceOf(impersonatedSigner.address);
+    const newDeadline = Math.floor(Date.now() / 1000) + (60 * 10); 
+
+    console.log("========================================================")
+    console.log("usdc balance after adding liquidity", Number(usdcNewBal));
+    console.log("dai balance after adding liquidity", Number(daiNewBal));
+
+    // Add liquidity to the pool
+    await ROUTER.addLiquidity(
+        USDC,
+        DAI,
+        amountADesired, // Desired amount of USDC
+        amountBDesired, // Desired amount of DAI
+        amountAMin,     // Minimum acceptable amount of USDC (with slippage tolerance)
+        amountBMin,     // Minimum acceptable amount of DAI (with slippage tolerance)
+        to,             // Address that will receive the LP tokens
+        newDeadline     // Transaction deadline
+    );
+
+    console.log("Liquidity added successfully.");
 
 
 
